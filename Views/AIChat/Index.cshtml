@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "AI-Assistans";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fas fa-robot"></i> AI Assist</h1>
+            <p class="page-subtitle">Ställ dina frågor kring omvårdnadsdokumentation och vårdåtgärder.</p>
+        </div>
+    </div>
+
+    <div class="card fade-in">
+        <div class="card-header">
+            <h3 class="card-title">
+                Chatta med AI-Dok
+            </h3>
+        </div>
+        <div class="card-body p-0">
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat-state">
+                        <div class="empty-chat-icon"><i class="fas fa-sparkles"></i></div>
+                        <h3>Hur kan jag hjälpa dig idag?</h3>
+                        <p>Ställ frågor om dokumentationsstandarder, patientvård eller omvårdnadsrutiner.</p>
+                        <div class="example-prompts">
+                            <button class="example-prompt" data-question="Hur dokumenterar man oro enligt VIPS?">
+                                Hur dokumenterar man oro enligt VIPS?
+                            </button>
+                            <button class="example-prompt" data-question="Vad är skillnaden mellan VIPS och SBAR?">
+                                Vad är skillnaden mellan VIPS och SBAR?
+                            </button>
+                            <button class="example-prompt" data-question="Hjälp mig skriva en professionell överlämningsanteckning">
+                                Hjälp mig skriva en professionell överlämningsanteckning
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <textarea id="messageInput" class="chat-textarea" placeholder="Ställ din fråga… - Tryck Enter för att skicka" rows="1"></textarea>
+                    <button id="sendButton" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/ai-chat.js" asp-append-version="true"></script>
+}

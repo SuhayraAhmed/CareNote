@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Login - CareNote";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/auth-login.css" asp-append-version="true" />
+</head>
+<body>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-icon">
+                <i class="fas fa-stethoscope"></i>
+            </div>
+            <div class="logo-text">
+                <h1>CareNote</h1>
+                <p>Smart Documentation for Healthcare</p>
+            </div>
+        </div>
+
+        <div class="login-options">
+            <!-- Google Login -->
+            <div class="login-section">
+                <h3>Google Sign In</h3>
+                <button id="googleLoginBtn" class="login-btn login-btn-google">
+                    <i class="fab fa-google"></i>
+                    Sign in with Google
+                </button>
+                <div class="login-info">
+                    <p><strong>For healthcare staff:</strong> Use your @@care.se email</p>
+                </div>
+            </div>
+
+            <!-- Email/Password Login - Visas först -->
+            <div class="login-section" id="loginSection">
+                <h3>Email & Password</h3>
+                
+                <!-- Login Form -->
+                <form id="emailLoginForm" class="auth-form">
+                    <div class="form-group">
+                        <input type="email" id="loginEmail" placeholder="care.se email address" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="loginPassword" placeholder="Password" required class="form-control">
+                    </div>
+                    <button type="submit" class="login-btn login-btn-primary">Sign In</button>
+                </form>
+
+                <!-- Create Account Knapp -->
+                <div class="switch-section">
+                    <p>Don't have an account?</p>
+                    <button type="button" id="showRegisterBtn" class="switch-btn">
+                        Create Account
+                    </button>
+                </div>
+            </div>
+            
+
+            <!-- Register Form - Dold från början -->
+            <div class="login-section" id="registerSection" style="display: none;">
+                <h3>Create Account</h3>
+                
+                <!-- Register Form -->
+                <form id="emailRegisterForm" class="auth-form">
+                    <div class="form-group">
+                        <input type="text" id="registerName" placeholder="Full Name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="registerEmail" placeholder="care.se email address" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required class="form-control">
+                    </div>
+                    <button type="submit" class="login-btn login-btn-success">Create Account</button>
+                </form>
+
+                <!-- Back to Login Knapp -->
+                <div class="switch-section">
+                    <p>Already have an account?</p>
+                    <button type="button" id="showLoginBtn" class="switch-btn">
+                        Back to Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/auth-login.js" asp-append-version="true"></script>
+</body>
+</html>

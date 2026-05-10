@@ -1,0 +1,82 @@
+/* Animationer för reflection */
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes typingDots {
+    0%, 20% {
+        color: rgba(0,0,0,0);
+        text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);
+    }
+    40% {
+        color: var(--text);
+        text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);
+    }
+    60% {
+        text-shadow: .25em 0 0 var(--text), .5em 0 0 rgba(0,0,0,0);
+    }
+    80%, 100% {
+        text-shadow: .25em 0 0 var(--text), .5em 0 0 var(--text);
+    }
+}
+
+/* Responsiv design för reflection */
+@media (max-width: 1024px) {
+    .reflection-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .reflection-info-card {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .reflection-chat {
+        height: 500px;
+    }
+
+    .reflection-message {
+        max-width: 90%;
+    }
+
+    .quick-prompts {
+        flex-direction: column;
+    }
+
+    .quick-prompt {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .reflection-chat {
+        height: 400px;
+    }
+
+    .reflection-messages {
+        padding: 0.75rem;
+    }
+
+    .reflection-input-container {
+        padding: 1rem;
+    }
+
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.875rem;
+    }
+
+    .reflection-message {
+        max-width: 95%;
+    }
+}

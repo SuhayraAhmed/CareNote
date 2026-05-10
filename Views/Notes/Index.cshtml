@@ -1,0 +1,78 @@
+@model IEnumerable<CareNote.Models.Note>
+@using CareNote.Services
+
+@{
+    ViewData["Title"] = "Anteckningar";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Anteckningar</h1>
+            <p class="page-subtitle">Alla dina patientanteckningar</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ny Anteckning
+        </a>
+    </div>
+
+    <div class="notes-container">
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3>Inga anteckningar än</h3>
+                <p>Skapa din första anteckning</p>
+            </div>
+        }
+        else
+        {
+            <div class="notes-list">
+                @foreach (var note in Model)
+                {
+                    <div class="note-item">
+                        <div class="note-header">
+                            <div class="patient-info">
+                                <div class="patient-avatar">
+                                    <i class="fas fa-user-injured"></i>
+                                </div>
+                                <div>
+                                    <h4 class="patient-name">@note.Patient</h4>
+
+                                    <div class="note-meta">
+                                        <span class="note-id">#@note.Id</span>
+
+                                        <span class="tag priority-@note.Priority.ToString().ToLower()">
+                                            @NoteFormatter.FormatPriority(note.Priority)
+                                        </span>
+
+                                        <span class="note-date">
+                                            @NoteFormatter.FormatDate(note.CreatedAt)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form asp-action="Delete"
+                                  method="post"
+                                  onsubmit="return confirm('Radera anteckningen?')">
+                                <input type="hidden" name="id" value="@note.Id" />
+                                <button type="submit" class="btn-icon btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="note-content">
+                            <div class="note-preview">
+                                @Html.Raw(NoteFormatter.FormatText(note.Text))
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

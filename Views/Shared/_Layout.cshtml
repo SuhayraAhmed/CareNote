@@ -1,0 +1,156 @@
+﻿@using System.Security.Claims
+@{
+       // Hämta användarnamn från Claims på ett säkert sätt
+    var userName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Användare";
+   
+    // Hämta användarens e-post, fallback om inte satt
+    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value ?? "email@care.se";
+   
+    // Skapa initial för användar-avatar
+    var userInitial = !string.IsNullOrEmpty(userName) ? userName[0].ToString().ToUpper() : "U";
+
+    string currentController = (ViewContext.RouteData.Values["Controller"]?.ToString() ?? "").ToLowerInvariant();
+    string currentAction = (ViewContext.RouteData.Values["Action"]?.ToString() ?? "").ToLowerInvariant();
+
+    // Funktion för att kolla om meny-item är aktivt
+    Func<string, string, bool> isActive = (ctrl, act) =>
+    {
+        if (string.IsNullOrEmpty(ctrl)) return false;
+        ctrl = ctrl.ToLowerInvariant();
+        act = (act ?? "").ToLowerInvariant();
+
+        // Matchar antingen bara controller eller controller + action
+        if (!string.IsNullOrEmpty(act))
+        {
+            return currentController == ctrl && currentAction == act;
+        }
+        return currentController == ctrl;
+    };
+}
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AI-Dok</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/notes.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ai-chat.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/knowledge.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reflection.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h2>AI-Dok</h2>
+                        <p>Smart Documentation</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <p class="nav-section-label">HUVUDMENY</p>
+
+                    <a class="nav-item @(isActive("home", "index") ? "active" : "")"
+                       asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a class="nav-item @(isActive("notes", "create") ? "active" : "")"
+                       asp-controller="Notes" asp-action="Create">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Skapa antekningar</span>
+                    </a>
+
+                    <a class="nav-item @(isActive("aichat", "index") ? "active" : "")"
+                       asp-controller="AIChat" asp-action="Index">
+                        <i class="fas fa-robot"></i>
+                        <span>AI Assistans</span>
+                    </a>
+
+                    <!-- Kunskapsbas - robust active check on controller name only -->
+                    <a class="nav-item @(isActive("knowledge", "") ? "active" : "")"
+                       asp-controller="Knowledge" asp-action="Index">
+                        <i class="fas fa-book-open"></i>
+                        <span>Kunskapsbas</span>
+                    </a>
+
+                    <a class="nav-item @(isActive("home", "reflection") ? "active" : "")"
+                       asp-controller="Home" asp-action="Reflection">
+                        <i class="fas fa-heart"></i>
+                        <span>Reflektionsläge</span>
+                    </a>
+
+                    <a class="nav-item @(isActive("notes", "index") ? "active" : "")"
+                       asp-controller="Notes" asp-action="Index">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Mina dokument</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <a class="nav-item @(isActive("home", "privacy") ? "active" : "")"
+                       asp-controller="Home" asp-action="Privacy">
+                        <i class="fas fa-cog"></i>
+                        <span>Inställningar</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>@userInitial</span>
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">@userName</p>
+                        <p class="user-email">@userEmail</p>
+                    </div>
+                </div>
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-outline btn-danger btn-block">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logga ut
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>AI-Dok</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

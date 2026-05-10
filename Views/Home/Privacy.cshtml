@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Manage your account and preferences</p>
+        </div>
+    </div>
+
+    <div class="settings-grid">
+        <!-- Account Info -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Account Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="setting-description">
+                    Your account is managed through the platform. For account settings and password changes, please contact your administrator.
+                </p>
+            </div>
+        </div>
+
+        <!-- Privacy & Security -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Privacy & Security
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="security-features">
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="security-title">End-to-End Encryption</h4>
+                            <p class="security-text">All your data is encrypted and stored securely</p>
+                        </div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="security-title">No Patient Data</h4>
+                            <p class="security-text">This system is for pre-documentation only</p>
+                        </div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="security-title">GDPR Compliant</h4>
+                            <p class="security-text">Your data is handled according to GDPR regulations</p>
+                        </div>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="security-title">Private Reflections</h4>
+                            <p class="security-text">All reflections are completely private</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    About AI-Dok
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="setting-description">
+                    <strong>AI-Dok</strong> is a smart documentation assistant designed specifically for nurses. 
+                    Our mission is to reduce administrative burden and free up more time for patient care.
+                </p>
+                <div class="about-features">
+                    <h4 class="about-title">Key Features:</h4>
+                    <ul class="about-list">
+                        <li>AI-powered documentation generation (VIPS/SBAR)</li>
+                        <li>Intelligent assistant for nursing questions</li>
+                        <li>Personal knowledge base management</li>
+                        <li>Professional reflection and growth tools</li>
+                        <li>Time-saving automated workflows</li>
+                    </ul>
+                </div>
+                <p class="version-info">
+                    Version 1.0.0 • Built with care for healthcare professionals
+                </p>
+            </div>
+        </div>
+
+        <!-- Sign Out -->
+        <div class="card">
+            <div class="card-body">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-outline btn-danger btn-block">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

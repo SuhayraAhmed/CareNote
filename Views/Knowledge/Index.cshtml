@@ -1,0 +1,933 @@
+@model List<CareNote.Models.KnowledgeFile>
+@{
+ViewData["Title"] = "Kunskapsbas";
+var modelList = Model ?? new List<CareNote.Models.KnowledgeFile>();
+}
+
+<div class="knowledge-container">
+    <!-- HEADER SECTION -->
+    <div class="knowledge-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="page-title">Kunskapsbas</h1>
+                <p class="page-subtitle">Hantera dina dokument och sök i öppna vårdkällor</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERTS -->
+    @if (TempData["Success"] != null)
+    {
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span>@TempData["Success"]</span>
+    </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>@TempData["Error"]</span>
+    </div>
+    }
+
+    <!-- MAIN CONTENT GRID -->
+    <div class="knowledge-grid">
+        <!-- SEARCH SECTION -->
+        <div class="knowledge-card search-section">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-search"></i>
+                    Sök i kunskapsbasen
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="search-container">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text"
+                               id="searchQuery"
+                               class="search-input"
+                               placeholder="Sök i dina filer eller externa källor (t.ex. diabetes, trycksår, hjärtsvikt...)">
+                    </div>
+                    <button id="searchBtn" class="btn btn-primary search-btn">
+                        <i class="fas fa-search"></i>
+                        <span>Sök</span>
+                    </button>
+                </div>
+
+                <div class="search-tips">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Förslag: "diabetes", "trycksår", "hjärtsvikt", "palliativ vård"</span>
+                </div>
+
+                <!-- SEARCH RESULTS -->
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </div>
+
+        <!-- UPLOAD SECTION -->
+        <div class="knowledge-card upload-section">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-upload"></i>
+                    Ladda upp dokument
+                </h2>
+            </div>
+            <div class="card-body">
+                <form asp-action="UploadFile" method="post" enctype="multipart/form-data" class="upload-form">
+                    <div class="file-input-container">
+                        <input type="file"
+                               name="file"
+                               class="file-input"
+                               accept=".pdf,.doc,.docx,.txt"
+                               required>
+                        <div class="file-input-info">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Välj PDF, Word eller textfil (max 10MB)</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success upload-btn">
+                        <i class="fas fa-upload"></i>
+                        Ladda upp fil
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- USER FILES SECTION -->
+        <div class="knowledge-card files-section">
+            <div class="card-header">
+                <div class="files-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-folder-open"></i>
+                        Mina filer
+                    </h2>
+                    <span class="files-count">@modelList.Count filer</span>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (!modelList.Any())
+                {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3 class="empty-title">Inga filer uppladdade ännu</h3>
+                    <p class="empty-description">Ladda upp ditt första dokument för att börja bygga din kunskapsbas</p>
+                </div>
+                }
+                else
+                {
+                <div class="files-grid">
+                    @foreach (var file in modelList.OrderByDescending(f => f.UploadedAt))
+                    {
+                    <div class="file-card" data-file-id="@file.Id">
+                        <div class="file-main">
+                            <div class="file-icon @GetFileTypeClass(file.FileType)">
+                                <i class="@GetFileIcon(file.FileType)"></i>
+                            </div>
+                            <div class="file-info">
+                                <h4 class="file-name">@file.FileName</h4>
+                                <div class="file-meta">
+                                            <span class="file-size">
+                                                <i class="fas fa-database"></i>
+                                                @((file.FileSize / 1024.0).ToString("F1")) KB
+                                            </span>
+                                    <span class="file-date">
+                                                <i class="fas fa-calendar"></i>
+                                        @file.UploadedAt.ToString("yyyy-MM-dd HH:mm")
+                                            </span>
+                                    <span class="file-type">
+                                                @file.FileType.ToUpper().TrimStart('.')
+                                            </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-icon btn-danger delete-file"
+                                    data-fileid="@file.Id"
+                                    title="Ta bort fil">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+private string GetFileTypeClass(string fileType)
+{
+return fileType.ToLower() switch
+{
+".pdf" => "file-type-pdf",
+".doc" or ".docx" => "file-type-word",
+".txt" => "file-type-text",
+_ => "file-type-other"
+};
+}
+
+private string GetFileIcon(string fileType)
+{
+return fileType.ToLower() switch
+{
+".pdf" => "fas fa-file-pdf",
+".doc" or ".docx" => "fas fa-file-word",
+".txt" => "fas fa-file-alt",
+_ => "fas fa-file"
+};
+}
+}
+
+<style>
+    /* KNOWLEDGE BASE LAYOUT */
+    .knowledge-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .knowledge-header {
+        margin-bottom: 2rem;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .header-text h1 {
+        margin: 0 0 0.5rem 0;
+        color: #1E293B;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .header-text p {
+        margin: 0;
+        color: #64748B;
+        font-size: 1.1rem;
+    }
+
+    .knowledge-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @@media (min-width: 1024px) {
+        .knowledge-grid {
+            grid-template-columns: 2fr 1fr;
+            grid-template-areas: 
+                "search upload"
+                "files files";
+        }
+
+        .search-section { grid-area: search; }
+        .upload-section { grid-area: upload; }
+        .files-section { grid-area: files; }
+    }
+
+    /* KNOWLEDGE CARDS */
+    .knowledge-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        border: 1px solid #E2E8F0;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #E2E8F0;
+        background: #F8FAFC;
+    }
+
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .card-title i {
+        color: #2563EB;
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* SEARCH SECTION */
+    .search-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .search-input-group {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        z-index: 2;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        color: #1E293B;
+        transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+
+    .search-tips {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748B;
+        margin-bottom: 1rem;
+    }
+
+    .search-tips i {
+        color: #F59E0B;
+    }
+
+    /* SEARCH RESULTS */
+    .search-results {
+        margin-top: 1rem;
+    }
+
+    .search-result-section {
+        margin-bottom: 2rem;
+    }
+
+    .search-result-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .search-result-item {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        border-left: 4px solid #2563EB;
+        transition: all 0.2s ease;
+    }
+
+    .search-result-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .search-result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-result-name {
+        margin: 0;
+        font-weight: 600;
+        color: #1E293B;
+        font-size: 1rem;
+    }
+
+    .search-result-relevance {
+        background: #ECFDF5;
+        color: #10B981;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .search-result-content {
+        margin: 0 0 0.75rem 0;
+        color: #64748B;
+        line-height: 1.5;
+        font-size: 0.9rem;
+    }
+
+    .external-result {
+        border-left-color: #06B6D4;
+    }
+
+    .external-result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .external-result-title {
+        margin: 0;
+        font-weight: 600;
+        color: #06B6D4;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+
+    .external-result-title:hover {
+        text-decoration: underline;
+    }
+
+    .external-result-description {
+        margin: 0 0 0.75rem 0;
+        color: #64748B;
+        line-height: 1.5;
+        font-size: 0.9rem;
+    }
+
+    .external-result-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #94A3B8;
+    }
+
+    .external-result-category {
+        background: #ECFEFF;
+        color: #0891B2;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-weight: 500;
+    }
+
+    /* UPLOAD SECTION */
+    .upload-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .file-input-container {
+        position: relative;
+    }
+
+    .file-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-input-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 2rem;
+        border: 2px dashed #E2E8F0;
+        border-radius: 8px;
+        background: #F8FAFC;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .file-input-info:hover {
+        border-color: #2563EB;
+        background: #EFF6FF;
+    }
+
+    .file-input-info i {
+        font-size: 2rem;
+        color: #94A3B8;
+    }
+
+    .file-input-info span {
+        color: #64748B;
+        font-size: 0.9rem;
+    }
+
+    .upload-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* FILES SECTION */
+    .files-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .files-count {
+        background: #EFF6FF;
+        color: #2563EB;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .files-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .file-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        transition: all 0.3s ease;
+    }
+
+    .file-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+        border-color: #2563EB;
+    }
+
+    .file-main {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .file-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .file-type-pdf {
+        background: #FEE2E2;
+        color: #EF4444;
+    }
+
+    .file-type-word {
+        background: #EFF6FF;
+        color: #2563EB;
+    }
+
+    .file-type-text {
+        background: #ECFDF5;
+        color: #10B981;
+    }
+
+    .file-type-other {
+        background: #F1F5F9;
+        color: #64748B;
+    }
+
+    .file-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .file-name {
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+        color: #1E293B;
+        font-size: 1.125rem;
+        word-break: break-word;
+    }
+
+    .file-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #64748B;
+    }
+
+    .file-size, .file-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .file-type {
+        background: #F1F5F9;
+        color: #475569;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .file-actions {
+        flex-shrink: 0;
+    }
+
+    .btn-icon {
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #CBD5E1;
+        margin-bottom: 1rem;
+    }
+
+    .empty-title {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1E293B;
+    }
+
+    .empty-description {
+        margin: 0;
+        color: #64748B;
+    }
+
+    /* LOADING STATES */
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748B;
+    }
+
+    .loading-spinner {
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* RESPONSIVE DESIGN */
+    @@media (max-width: 768px) {
+        .knowledge-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+        }
+
+        .search-container {
+            flex-direction: column;
+        }
+
+        .file-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .file-main {
+            width: 100%;
+        }
+
+        .file-actions {
+            align-self: flex-end;
+        }
+
+        .file-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .file-card {
+            padding: 1rem;
+        }
+
+        .file-name {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+@section Scripts {
+<script>
+    $(function () {
+        let currentSearchQuery = '';
+
+        // Enter key search
+        $('#searchQuery').on('keypress', function (e) {
+            if (e.which === 13) {
+                performSearch();
+            }
+        });
+
+        // Search button click
+        $('#searchBtn').on('click', function () {
+            performSearch();
+        });
+
+        function performSearch() {
+            const query = $('#searchQuery').val().trim();
+            if (!query) {
+                showError('Ange ett sökord för att söka.');
+                return;
+            }
+
+            if (query.length < 2) {
+                showError('Sökordet måste vara minst 2 tecken långt.');
+                return;
+            }
+
+            currentSearchQuery = query;
+            $('#searchBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Söker...');
+
+            // Show loading state
+            $('#searchResults').html(`
+                <div class="loading">
+                    <i class="fas fa-search fa-3x text-gray-400 mb-3"></i>
+                    <h3>Söker efter "${query}"</h3>
+                    <p>Vi söker i dina filer och öppna vårdkällor...</p>
+                    <div class="mt-3">
+                        <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                    </div>
+                </div>
+            `);
+
+            $.post('/Knowledge/Search', { query: query })
+                .done(function (data) {
+                    displaySearchResults(data, query);
+                })
+                .fail(function (xhr, status, error) {
+                    showError('Sökningen misslyckades. Kontrollera din internetanslutning.');
+                    console.error('Search failed:', error);
+                })
+                .always(function () {
+                    $('#searchBtn').prop('disabled', false).html('<i class="fas fa-search"></i><span>Sök</span>');
+                });
+        }
+
+        function displaySearchResults(data, query) {
+            if (!data || data.success === false) {
+                showError(data?.error || 'Sökningen gav inget resultat.');
+                return;
+            }
+
+            const userResults = data.userResults || [];
+            const externalResults = data.externalResults || [];
+            let html = '';
+
+            // Search summary
+            html += `
+                <div class="search-result-item" style="border-left-color: #3B82F6; background: #DBEAFE;">
+                    <div class="search-result-header">
+                        <h4 class="search-result-name">Sökresultat för "${query}"</h4>
+                    </div>
+                    <p class="search-result-content">
+                        Hittade ${userResults.length} matchning(ar) i dina filer och 
+                        ${externalResults.length} externa källor
+                    </p>
+                </div>
+            `;
+
+            // User files results
+            if (userResults.length > 0) {
+                html += `<div class="search-result-section">`;
+                html += `<h5 class="search-result-title"><i class="fas fa-folder"></i> Dina filer (${userResults.length})</h5>`;
+
+                userResults.forEach((r, index) => {
+                    const relevancePercent = Math.round(r.relevance * 100);
+                    html += `
+                        <div class="search-result-item">
+                            <div class="search-result-header">
+                                <h5 class="search-result-name">
+                                    <i class="fas fa-file text-gray-400 mr-2"></i>
+                                    ${r.fileName}
+                                </h5>
+                                <span class="search-result-relevance">${relevancePercent}% match</span>
+                            </div>
+                            <p class="search-result-content">${r.content}</p>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            // External resources results
+            if (externalResults.length > 0) {
+                html += `<div class="search-result-section">`;
+                html += `<h5 class="search-result-title"><i class="fas fa-globe"></i> Externa vårdkällor (${externalResults.length})</h5>`;
+
+                externalResults.forEach(r => {
+                    const relevanceStars = '★'.repeat(Math.floor((r.relevanceScore || 50) / 20));
+                    html += `
+                        <div class="search-result-item external-result">
+                            <div class="external-result-header">
+                                <a href="${r.url}" target="_blank" class="external-result-title">
+                                    ${r.title}
+                                </a>
+                                <span class="search-result-relevance">${relevanceStars}</span>
+                            </div>
+                            <p class="external-result-description">${r.description}</p>
+                            <div class="external-result-meta">
+                                <span class="external-result-category">${r.category}</span>
+                                <span><i class="fas fa-source mr-1"></i>${r.source}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            // No results
+            if (!userResults.length && !externalResults.length) {
+                html = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="empty-title">Inga resultat hittades</h3>
+                        <p class="empty-description">Prova med ett annat sökord eller ladda upp fler dokument.</p>
+                    </div>
+                `;
+            }
+
+            $('#searchResults').html(html);
+        }
+
+        function showError(message) {
+            $('#searchResults').html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                </div>
+            `);
+        }
+
+        // Delete file
+        $(document).on('click', '.delete-file', function (e) {
+            e.preventDefault();
+            const fileId = $(this).data('fileid');
+            const fileName = $(this).closest('.file-card').find('.file-name').text();
+
+            if (!confirm(`Är du säker på att du vill ta bort "${fileName}"?`)) return;
+
+            const $button = $(this);
+            $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+            $.post('/Knowledge/DeleteFile', { fileId: fileId })
+                .done(function (res) {
+                    if (res && res.success) {
+                        $button.closest('.file-card').fadeOut(300, function() {
+                            $(this).remove();
+                            showTemporarySuccess('Filen har tagits bort.');
+                        });
+                    } else {
+                        alert(res?.error || 'Kunde inte ta bort filen.');
+                        $button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                    }
+                })
+                .fail(function () {
+                    alert('Ett fel uppstod. Kunde inte ta bort filen.');
+                    $button.prop('disabled', false).html('<i class="fas fa-trash"></i>');
+                });
+        });
+
+        function showTemporarySuccess(message) {
+            const $alert = $(`
+                <div class="alert alert-success" style="position: fixed; top: 20px; right: 20px; z-index: 1000; animation: slideInRight 0.3s ease-out;">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `);
+
+            $('body').append($alert);
+
+            setTimeout(() => {
+                $alert.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }, 3000);
+        }
+    });
+</script>
+}
