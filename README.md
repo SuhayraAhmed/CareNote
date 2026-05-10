@@ -184,9 +184,17 @@ Tester          xUnit + Moq
 Byggsystem      .NET CLI
 
 
+##  Bilder
+<img width="904" height="1354" alt="image" src="https://github.com/user-attachments/assets/c4ff7373-a763-4f83-99d8-9f9ff8532687" />
+<img width="2862" height="1542" alt="image" src="https://github.com/user-attachments/assets/b63afeec-e36e-4b46-9c75-01ba42f8aed7" />
+<img width="2636" height="1476" alt="image" src="https://github.com/user-attachments/assets/2129e856-7375-4718-a8f1-07cc697f1b83" />
+<img width="2570" height="1526" alt="image" src="https://github.com/user-attachments/assets/74cb558a-7e17-4eae-81c6-070e9b5b8bc0" />
+<img width="2576" height="1552" alt="image" src="https://github.com/user-attachments/assets/db953b62-7810-4ed7-8f30-321c112d4eeb" />
+<img width="2476" height="1538" alt="image" src="https://github.com/user-attachments/assets/bb74f0bd-021b-4b13-827f-f1a30f06a5b0" />
+<img width="2550" height="1546" alt="image" src="https://github.com/user-attachments/assets/6cd2fece-ad58-47e3-8a6f-28a5ffe89006" />
+<img width="2534" height="1554" alt="image" src="https://github.com/user-attachments/assets/15fe6b9c-9f05-40e8-8e5d-f13766bc22b7" />
 
-## Licens
 
-Projektet är en del av **CareNote Project © 2025** Alla rättigheter
-reserverade. Utvecklat för användning inom vård och omsorg som stöd för
-reflektion och dokumentation.
+
+
+
