@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <UserSecretsId>CareNote-Dev-12345</UserSecretsId>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
+      <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
+      <PackageReference Include="Google.Cloud.Firestore" Version="3.12.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0-rc.2.25502.107" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\css\ai-chat.css" />
+      <None Include="wwwroot\css\notes.css" />
+      <None Include="wwwroot\js\ai-chat.js" />
+    </ItemGroup>
+
+</Project>
