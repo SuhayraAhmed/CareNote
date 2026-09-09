@@ -1,200 +1,202 @@
+# CareNote – Smart Documentation for Healthcare
 
-# CareNote -- Smart Documentation for Healthcare
+CareNote is a web application built with **ASP.NET Core MVC (.NET 8)** to support healthcare professionals with documentation, reflection, and knowledge management.
 
-CareNote är en webbapplikation byggd med **ASP.NET Core MVC (.NET 8)**
-för att stödja vårdpersonal i dokumentation, reflektion och
-kunskapshantering.\
-Systemet använder **Firebase Firestore** för autentisering och
-datalagring samt **GroqAIService** för AI-genererade svar och
-reflektioner.
+The system uses **Firebase Firestore** for authentication and data storage, as well as **GroqAIService** to provide AI-generated responses and reflections.
 
-------------------------------------------------------------------------
+---
 
-## Innehållsförteckning
+## Table of Contents
 
-1.  [Funktioner](#funktioner)
-2.  [Projektstruktur](#projektstruktur)
-3.  [Systemkrav](#systemkrav)
-4.  [Installation och konfiguration](#installation-och-konfiguration)
-5.  [Köra applikationen](#köra-applikationen)
-6.  [Testning](#testning)
-7.  [Teknisk översikt](#teknisk-översikt)
-8.  [Licens](#licens)
+1. [Features](#features)
+2. [Project Structure](#project-structure)
+3. [System Requirements](#system-requirements)
+4. [Installation and Configuration](#installation-and-configuration)
+5. [Running the Application](#running-the-application)
+6. [Authentication](#authentication)
+7. [Testing](#testing)
+8. [Technical Overview](#technical-overview)
+9. [Images](#images)
 
-------------------------------------------------------------------------
+---
 
-## Funktioner
+## Features
 
-  -----------------------------------------------------------------------
-Modul                       Beskrivning
-  --------------------------- -------------------------------------------
-AI Chat                     Chatfunktion som erbjuder AI-stöd i
-vårddokumentation och rutiner.
+| Module             | Description                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| **AI Chat**        | Chat functionality that provides AI support for healthcare documentation and procedures.                  |
+| **Reflection**     | A reflection mode that generates questions and insights to support professional development.              |
+| **Knowledge Base** | Search functionality for personal files and external sources such as 1177, WHO, SBU, and Socialstyrelsen. |
+| **Notes**          | Create, edit, and manage personal notes.                                                                  |
+| **Authentication** | Sign in with Google (restricted to `@care.se` addresses) or with email and password.                      |
 
-Reflektion                  Ett reflektionsläge som genererar frågor
-och insikter för professionell utveckling.
+---
 
-Kunskapsbas                 Sökning i egna filer och externa källor som
-1177, WHO, SBU och Socialstyrelsen.
+## Project Structure
 
-Anteckningar                Skapa, redigera och hantera egna
-anteckningar.
+```text
+CareNote/
+│
+├── Controllers/
+│   ├── AIChatController.cs
+│   ├── AuthController.cs
+│   ├── HomeController.cs
+│   ├── NotesController.cs
+│
+├── Models/
+│   ├── Note.cs
+│   ├── User.cs
+│   ├── KnowledgeFile.cs
+│   ├── NoteModel.cs
+│   ├── ErrorViewModel.cs
+│
+├── Services/
+│   ├── FirebaseAuthService.cs
+│   ├── GroqAIService.cs
+│   ├── KnowledgeService.cs
+│   ├── NoteRepository.cs
+│   ├── Interfaces/
+│       ├── INoteRepository.cs
+│       ├── IKnowledgeService.cs
+│
+├── Views/
+│   ├── Auth/
+│   ├── Home/
+│   ├── AIChat/
+│   ├── Notes/
+│
+├── wwwroot/
+│   ├── css/
+│   ├── js/
+│
+├── Program.cs
+├── appsettings.Development.json
+└── firebase-service-account.json (local file, not version controlled)
 
-Autentisering               Inloggning via Google (endast
-@care.se-adresser) eller e-post och
-lösenord.
-  -----------------------------------------------------------------------
+CareNoteTest/
+├── CareNoteTest.csproj
+├── UnitTest1.cs
+└── FirebaseAuthServiceTests.cs
+```
 
-------------------------------------------------------------------------
+---
 
-## Projektstruktur
+## System Requirements
 
-    CareNote/
-    │
-    ├── Controllers/
-    │   ├── AIChatController.cs
-    │   ├── AuthController.cs
-    │   ├── HomeController.cs
-    │   ├── NotesController.cs
-    │
-    ├── Models/
-    │   ├── Note.cs
-    │   ├── User.cs
-    │   ├── KnowledgeFile.cs
-    │   ├── NoteModel.cs
-    │   ├── ErrorViewModel.cs
-    │
-    ├── Services/
-    │   ├── FirebaseAuthService.cs
-    │   ├── GroqAIService.cs
-    │   ├── KnowledgeService.cs
-    │   ├── NoteRepository.cs
-    │   ├── Interfaces/
-    │       ├── INoteRepository.cs
-    │       ├── IKnowledgeService.cs
-    │
-    ├── Views/
-    │   ├── Auth/
-    │   ├── Home/
-    │   ├── AIChat/
-    │   ├── Notes/
-    │
-    ├── wwwroot/
-    │   ├── css/
-    │   ├── js/
-    │
-    ├── Program.cs
-    ├── appsettings.Development.json
-    └── firebase-service-account.json (lokal fil, ej versionshanterad)
+Before running the application, make sure you have:
 
-    CareNoteTest/
-    ├── CareNoteTest.csproj
-    ├── UnitTest1.cs
-    └── FirebaseAuthServiceTests.cs
+* .NET 8 SDK
+* Visual Studio 2022, JetBrains Rider, or Visual Studio Code
+* A Google Cloud project with **Firebase Firestore**
+* A valid **Service Account file** (`firebase-service-account.json`)
+* A valid **Groq API key**
 
-------------------------------------------------------------------------
+---
 
-## Systemkrav
+## Installation and Configuration
 
--   [.NET 8 SDK](https://dotnet.microsoft.com/download)
--   Visual Studio 2022, JetBrains Rider eller Visual Studio Code
--   Ett Google Cloud-projekt med **Firebase Firestore**
--   En giltig **Service Account-fil** (`firebase-service-account.json`)
--   En giltig **Groq API-nyckel**
+### 1. Navigate to the project
 
-------------------------------------------------------------------------
-
-## Installation och konfiguration
-
-### 1. Navigera till projektet
-
-``` bash
+```bash
 cd CareNote
 ```
 
+---
 
+## Running the Application
 
-## Köra applikationen
+### Build the project
 
-### Bygg projektet
-
-``` bash
+```bash
 dotnet build
 ```
 
-### Starta applikationen
+### Run the application
 
-``` bash
+```bash
 dotnet run
 ```
 
+---
 
+## Authentication
 
-## Autentisering
+Only users with email addresses ending in `@care.se` can register and sign in.
 
-Endast användare med e-postadresser som slutar på `@care.se` kan
-registrera sig och logga in.
+The application supports:
 
-Stöd för: - Google-inloggning via Firebase - E-post och lösenord -
-Sessioner hanteras via cookies
+* Google Sign-In through Firebase
+* Email and password authentication
+* Cookie-based session management
 
+---
 
-## Testning
+## Testing
 
-Testerna finns i ett separat projekt: **CareNoteTest**
+Tests are located in a separate project called **CareNoteTest**.
 
-### Struktur
+### Structure
 
-    CareNoteTest/
-    ├── UnitTest1.cs
-    ├── FirebaseAuthServiceTests.cs
-    └── CareNoteTest.csproj
+```text
+CareNoteTest/
+├── UnitTest1.cs
+├── FirebaseAuthServiceTests.cs
+└── CareNoteTest.csproj
+```
 
-### Syfte
+### Purpose
 
--   `UnitTest1.cs` testar modellen `Note`
--   `FirebaseAuthServiceTests.cs` testar loggning och felhantering i
-    `FirebaseAuthService`
+* `UnitTest1.cs` tests the `Note` model.
+* `FirebaseAuthServiceTests.cs` tests logging and error handling in `FirebaseAuthService`.
 
-### Kör tester
+### Run the Tests
 
-``` bash
+```bash
 cd CareNoteTest
 dotnet test
 ```
 
-Exempel på testresultat:
+Example test results:
 
-    ✓ Note_Should_Create_Correctly [PASSED]
-    ✓ Constructor_MissingServiceAccountPath_LogsWarning [PASSED]
-    ✓ Constructor_FileNotFound_LogsErrorAndWarning [PASSED]
-    ✓ Constructor_ValidServiceAccountPath_LogsInitializationAttempt [PASSED]
+```text
+✓ Note_Should_Create_Correctly [PASSED]
+✓ Constructor_MissingServiceAccountPath_LogsWarning [PASSED]
+✓ Constructor_FileNotFound_LogsErrorAndWarning [PASSED]
+✓ Constructor_ValidServiceAccountPath_LogsInitializationAttempt [PASSED]
+```
 
+---
 
+## Technical Overview
 
-## Teknisk översikt
+| Component          | Technology                                 |
+| ------------------ | ------------------------------------------ |
+| **Backend**        | ASP.NET Core MVC (.NET 8)                  |
+| **Database**       | Firebase Firestore                         |
+| **AI Service**     | GroqAIService (e.g. LLaMA model)           |
+| **Authentication** | CookieAuthentication + FirebaseAuthService |
+| **Testing**        | xUnit + Moq                                |
+| **Build System**   | .NET CLI                                   |
 
-Komponent       Beskrivning
+---
 
-Backend         ASP.NET Core MVC (.NET 8)
-Databas         Firebase Firestore
-AI-tjänst       GroqAIService (t.ex. LLaMA-modell)
-Autentisering   CookieAuthentication + FirebaseAuthService
-Tester          xUnit + Moq
-Byggsystem      .NET CLI
+## Images
 
+<img width="904" height="1354" alt="CareNote application" src="https://github.com/user-attachments/assets/c4ff7373-a763-4f83-99d8-9f9ff8532687" />
 
-##  Bilder
-<img width="904" height="1354" alt="image" src="https://github.com/user-attachments/assets/c4ff7373-a763-4f83-99d8-9f9ff8532687" />
-<img width="2862" height="1542" alt="image" src="https://github.com/user-attachments/assets/b63afeec-e36e-4b46-9c75-01ba42f8aed7" />
-<img width="2636" height="1476" alt="image" src="https://github.com/user-attachments/assets/2129e856-7375-4718-a8f1-07cc697f1b83" />
-<img width="2570" height="1526" alt="image" src="https://github.com/user-attachments/assets/74cb558a-7e17-4eae-81c6-070e9b5b8bc0" />
-<img width="2576" height="1552" alt="image" src="https://github.com/user-attachments/assets/db953b62-7810-4ed7-8f30-321c112d4eeb" />
-<img width="2476" height="1538" alt="image" src="https://github.com/user-attachments/assets/bb74f0bd-021b-4b13-827f-f1a30f06a5b0" />
-<img width="2550" height="1546" alt="image" src="https://github.com/user-attachments/assets/6cd2fece-ad58-47e3-8a6f-28a5ffe89006" />
-<img width="2534" height="1554" alt="image" src="https://github.com/user-attachments/assets/15fe6b9c-9f05-40e8-8e5d-f13766bc22b7" />
+<img width="2862" height="1542" alt="CareNote application" src="https://github.com/user-attachments/assets/b63afeec-e36e-4b46-9c75-01ba42f8aed7" />
 
+<img width="2636" height="1476" alt="CareNote application" src="https://github.com/user-attachments/assets/2129e856-7375-4718-a8f1-07cc697f1b83" />
 
+<img width="2570" height="1526" alt="CareNote application" src="https://github.com/user-attachments/assets/74cb558a-7e17-4eae-81c6-070e9b5b8bc0" />
+
+<img width="2576" height="1552" alt="CareNote application" src="https://github.com/user-attachments/assets/db953b62-7810-4ed7-8f30-321c112d4eeb" />
+
+<img width="2476" height="1538" alt="CareNote application" src="https://github.com/user-attachments/assets/bb74f0bd-021b-4b13-827f-f1a30f06a5b0" />
+
+<img width="2550" height="1546" alt="CareNote application" src="https://github.com/user-attachments/assets/6cd2fece-ad58-47e3-8a6f-28a5ffe89006" />
+
+<img width="2534" height="1554" alt="CareNote application" src="https://github.com/user-attachments/assets/15fe6b9c-9f05-40e8-8e5d-f13766bc22b7" />
 
 
 
